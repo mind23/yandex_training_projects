@@ -1,0 +1,125 @@
+/*
+SELECT ID_FIELD_SELECT, DESC_SELECT_FIELD,  expression , ID_SELECT  
+FROM gis_techno.SELECT_FIELDS
+join gis_techno.SELECT_GROUP_FIELDS_SELECT on SELECT_FIELDS.select_group_field = SELECT_GROUP_FIELDS_SELECT.ID_GROUP_FIELDS 
+where ID_SELECT in (2277, 2279, 3483, 3513, 3727, 3728, 4939, 7187) and  isCalculated = true
+order by ID_SELECT
+
+*/
+
+update gis_techno.SELECT_FIELDS 
+set expression = 'concat(cast(extract(epoch from (select c.dateStart FROM sale.Contract c where c.idSale = t6712.id order by c.dateStart desc limit 1 )) as varchar(50))
+,''-'',REPEAT(''0'',8-char_length(cast(t6712.id as varchar(20)))) ,cast(t6712.id as varchar(20)))'
+where ID_FIELD_SELECT = 42294;
+
+update gis_techno.SELECT_FIELDS 
+set expression = '(select  right(s.ResponsivePerson,  char_length (s.ResponsivePerson)- position('' '' in s.ResponsivePerson ) ) from sale.sale_test s where t6712.id=s.id limit 1)'
+where ID_FIELD_SELECT = 25408;
+
+update gis_techno.SELECT_FIELDS 
+set expression = '(SELECT to_char((msknum * interval ''1 hour'') + now() , ''HH24:MI'') || '' ''||  times.msk  FROM sale.times where idsub = t6712.idSub limit 1)'
+where ID_FIELD_SELECT = 30653;
+
+update gis_techno.SELECT_FIELDS 
+set expression = '(SELECT case when msknum <=0 then cast(msknum as varchar(5)) else ''+''|| cast(msknum as varchar(5)) end  FROM sale.times
+where idsub = t6712.idSub limit 1)'
+where ID_FIELD_SELECT = 42687 ;
+
+update gis_techno.SELECT_FIELDS 
+set expression =  'concat (t6712.Name, coalesce('' ('' || t6712.remark_meta || '')'',''''), coalesce('' ИНН ''|| t6712.RekInn ,''''), E''\n'', ''Время '' 
+,(SELECT  to_char((msknum * interval ''1 hour'') + now() , ''HH24:MI'') || '' ('' ||  cast(msknum as varchar(3))|| '')'' FROM sale.times where idsub = t6712.idSub limit 1 ))'
+where ID_FIELD_SELECT = 30103;
+
+update gis_techno.SELECT_FIELDS 
+set expression = 
+ 'coalesce(left(alias42628.DESC_OBJECT , position('' '' in coalesce(alias42628.DESC_OBJECT,''?''))-1) || '':''|| E''\n'','''') 
+|| ((coalesce(RemarkCall,'''') || E''\n'') || coalesce(to_char(DateCall , ''dd.MM.yyyy''),'''')) 
+|| case when (select count (ID_DOC) from gis_techno.DOC where DOC.idSelect = 2279 and (''x'' || right(new.recordKey::text,8))::bit(32)::int  = t6713.id) > 0
+then E''\n'' || ''Файл во вложении'' else '''' end'
+where ID_FIELD_SELECT = 41948;
+
+update gis_techno.SELECT_FIELDS 
+set expression = 'case when alias25456.disable = true then ''#ff8e7f'' end'
+where ID_FIELD_SELECT = 25956;
+
+update gis_techno.SELECT_FIELDS 
+set expression = '(''<a href="https://gisbis.org/admin/users.html?id='' || alias25456.ID_OBJECT::varchar(20) ||''"  target="_blank">'' || alias25456.DESC_OBJECT
+|| coalesce(E''\n'' || alias25456.post,'''') || ''</a>'' || coalesce(E''\n'' || (select text from gis_techno.userContact where idUser = t175.ID_CHILD_OBJECT and idContactType = 1 limit 1),'''')    
+|| coalesce( E''\n'' || (select text from gis_techno.userContact where idUser = t175.ID_CHILD_OBJECT and idContactType = 2 limit 1),'''') )'
+where ID_FIELD_SELECT = 25457;
+
+update gis_techno.SELECT_FIELDS 
+set expression = '(case when  t9561.PriceObespech is not null and t9561.PriceObespech <> 0::money and t9561.isTextObesp = 0  then 
+case when  t9561.type_ooo_ip =1 then ''ИП Белов Илья Сергеевич'' else  ''ООО "ГИС БИС"'' end
+|| '' просит осуществить возврат денежных средств, внесенных в качестве обеспечения исполнения ''
+||  replace(replace(replace(t9561.header,''Муниципальный'',''муниципального''),''Контракт'',''контракта''),''Договор'',''договора'' ) || 
+coalesce( '' ('' || t9561.subject || '') '' ,'''') || '' платежным поручением _ от _ в размере:'' || E''\n'' || E''\n''
+||  coalesce(left(cast(t9561.PriceObespech as varchar(20)), char_length(cast(t9561.PriceObespech as varchar(20))) -3),'''') 
+|| coalesce('' (''|| replace(replace(replace(t9561.PriceObespechText,'' рублей'','') рублей''),'' рубля'','') рубля''),'' рубль'','') рубль'') ,'''') 
+when t9561.PriceObespech = 0::money  then ''_''  else '''' end )'
+where ID_FIELD_SELECT = 28508;
+
+update gis_techno.SELECT_FIELDS 
+set expression = 'case when alias29169.id =1 or( t9561.dateStart <= now()::date and t9561.dateEnd >= now()::date ) then ''#f9e37f'' end'
+where ID_FIELD_SELECT = 25955;
+
+update gis_techno.SELECT_FIELDS 
+set expression = 'case when t6713.is_sends = true then  ''#999999'' end'
+where ID_FIELD_SELECT = 42728;
+
+update gis_techno.SELECT_FIELDS 
+set expression = 'cast(to_char ( t10479.dateStart, ''yyyyMMdd'') as int)  + (case when alias28526.id = 1 then 1 else -1000 end)'
+where ID_FIELD_SELECT = 28563;
+
+update gis_techno.SELECT_FIELDS 
+set expression = 'date_part(''year'', t10479.dateEnd)'
+where ID_FIELD_SELECT = 29133;
+
+update gis_techno.SELECT_FIELDS 
+set expression = '(case when t10479.type = 1 then  t10479.Price
+ when t10479.type = 2 then (date_part(''year'', AGE( t10479.dateEnd , t10479.dateStart)) * 12 +  
+ DATE_PART(''month'', AGE(t10479.dateEnd , t10479.dateStart))+1) *  t10479.Price end )'
+where ID_FIELD_SELECT = 39535;
+
+update gis_techno.SELECT_FIELDS 
+set expression = 'case when t10479.iscomplete = true and  t10479.isoplataok = false then ''#c8d5c3'' 
+when t10479.iscomplete = true and  t10479.isoplataok = true then ''#79a16a'' else null end'
+where ID_FIELD_SELECT = 29259;
+
+update gis_techno.SELECT_FIELDS 
+set expression = '(SELECT sale.rubphrase (case when t9561.isTextObesp = 1 then 0 else  t9561.PriceObespech - coalesce((SELECT  sum(SummBack) FROM sale.deposits_back where idContract =  t9561.id),0) end))'
+where ID_FIELD_SELECT = 37717;
+
+update gis_techno.SELECT_FIELDS 
+set expression = 'coalesce(t9561.[header] || E''\n'' || alias28546.[Name] ,'''')'
+where ID_FIELD_SELECT = 28560;
+
+update gis_techno.SELECT_FIELDS 
+set expression = '(case when t9561.idStatus = 1 or ( t9561.dateStart <= now()::date and t9561.dateEnd >= now()::date ) then ''#f9e37f'' end)'
+where ID_FIELD_SELECT = 28559;
+
+update gis_techno.SELECT_FIELDS 
+set expression = 'replace((case when t9561.isTextObesp = 1 then 0::money else 
+(t9561.PriceObespech - coalesce ((SELECT sum(SummBack) FROM Sale.deposits_back where idContract =  t9561.id),0::money)::money) end)::text ,'' ?'','''')::money'
+where ID_FIELD_SELECT = 31821;
+
+update gis_techno.SELECT_FIELDS 
+set expression = 'to_char (t13119.data,''dd.MM.yyyy'') || coalesce ( '' '' || cast(t13119.SummBack as varchar(20)) || '' р.'','''')'
+where ID_FIELD_SELECT = 31819;
+
+update gis_techno.SELECT_FIELDS 
+set expression = 'coalesce(left(alias42628.DESC_OBJECT , position('' '' in coalesce(alias42628.DESC_OBJECT,''?''))-1) || '':''|| E''\n'','''') || ((coalesce(RemarkCall,'''') 
+|| E''\n'') || coalesce(to_char(DateCall , ''dd.MM.yyyy''),''''))'
+where ID_FIELD_SELECT = 42632;
+
+
+
+update gis_techno.SELECT_FIELDS 
+set expression = replace(replace(replace(expression,'[',''),']',''),'dbo.','')
+where ID_FIELD_SELECT in 
+(
+SELECT ID_FIELD_SELECT
+FROM gis_techno.SELECT_FIELDS
+join gis_techno.SELECT_GROUP_FIELDS_SELECT on SELECT_FIELDS.select_group_field = SELECT_GROUP_FIELDS_SELECT.ID_GROUP_FIELDS 
+where ID_SELECT in (2277, 2279, 3483, 3513, 3727, 3728, 4939, 7187) and  isCalculated = true
+);
